@@ -81,8 +81,6 @@ If some point clouds are stored in BIN format, you can use the following code to
 ```shell
 python bin2ascii.py
 ```
-The testing rusults can be found in output_rootdir
-
 
 ## Authors
 These files are provided by Hangzhou Normal University [3DPCC](https://github.com/3dpcc) and Nanjing University  [Vision Lab](https://vision.nju.edu.cn/). Please contact us (zhangjunzhe@stu.hznu.edu.cn) if you have any questions.
