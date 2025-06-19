@@ -34,20 +34,16 @@ def multiscale(ground_truth, gt_file, is_voxel):
 def knn_search(scale,
                        ground_truth_coords, ground_truth_feats,
                        distortion_pc_coords, distortion_pc_feats, k):
-    # 张量 → numpy
     coords_k = scale.C[:,1:].cpu().numpy()          # (N_k,3)
     coords_d = distortion_pc_coords.cpu().numpy()    # (N_d,3)
     feats_d = distortion_pc_feats.cpu().numpy()      # (N_d,F)
-    # 构建树并查询
     tree = cKDTree(coords_d)
     dists_dd, idx_dd = tree.query(coords_k, k=k)
-    # B→1 维度补回 Torch
     idx_dd = torch.from_numpy(idx_dd).long().to(distortion_pc_coords.device)       # (N_k, K)
     dists_dd = torch.from_numpy(dists_dd).float().to(distortion_pc_coords.device)   # (N_k, K)
     coords_dd = distortion_pc_coords[idx_dd]                                       # (N_k, K, 3)
     feats_dd  = distortion_pc_feats[idx_dd]                                        # (N_k, K, F)
 
-    # 同理对 ground_truth 做一次
     coords_gt = ground_truth_coords.cpu().numpy()
     feats_gt  = ground_truth_feats.cpu().numpy()
     tree2 = cKDTree(coords_gt)
@@ -57,7 +53,6 @@ def knn_search(scale,
     coords_dr = ground_truth_coords[idx_dr]
     feats_dr  = ground_truth_feats[idx_dr]
 
-    # 恢复 batch 维度 (B=1)
     return {
       'coords_dd': coords_dd.unsqueeze(0),
       'coords_dr': coords_dr.unsqueeze(0),
@@ -91,7 +86,6 @@ def knn_search_not_voxel(scale,
     coords_dr = ground_truth_coords[idx_dr]
     feats_dr  = ground_truth_feats[idx_dr]
 
-    # 恢复 batch 维度 (B=1)
     return {
       'coords_dd': coords_dd.unsqueeze(0),
       'coords_dr': coords_dr.unsqueeze(0),
@@ -166,23 +160,19 @@ def score_point(ground_truth, distortion_pc, k, scale1, scale2, scale3, scale4):
 from concurrent.futures import ThreadPoolExecutor
 
 def score_point_parallel(ground_truth, distortion_pc, k, scales):
-    # 1. 读入并排序一次
     distortion_pc_coords, distortion_pc_feats = read_ply_ascii(distortion_pc)
     ground_truth_coords,   ground_truth_feats = read_ply_ascii(ground_truth)
     # ground_truth_coords,   ground_truth_feats = sort_tensor(ground_truth_coords,   ground_truth_feats)
     # distortion_pc_coords,  distortion_pc_feats = sort_tensor(distortion_pc_coords,  distortion_pc_feats)
 
-    # 2. 准备参数列表
     knn_args = [
         (scale, ground_truth_coords, ground_truth_feats,
          distortion_pc_coords, distortion_pc_feats, k)
         for scale in scales
     ]
-    # 3. 并行 knn_search（结果顺序与 scales 一致）
     with ThreadPoolExecutor(max_workers=len(scales)) as executor:
         knn_results = list(executor.map(lambda args: knn_search(*args), knn_args))
 
-    # 4. 并行 score 计算（同样保持顺序）
     score_args = [
         (knn_results[i], scales[i].F, k, '2-norm')
         for i in range(len(scales))
@@ -191,7 +181,6 @@ def score_point_parallel(ground_truth, distortion_pc, k, scales):
         # 每个 result 是 (score_i, _, _)
         score_results = list(executor.map(lambda args: score(*args), score_args))
 
-    # 5. 提取分数并平均
     scores = [res[0] for res in score_results]
     final_score = sum(scores) / len(scores)
     return final_score
@@ -232,17 +221,13 @@ def parse_args():
 
 
 def set_seed(seed=42):
-    # Python 内置随机数
     random.seed(seed)
-    # Numpy 随机数
     np.random.seed(seed)
-    # PyTorch 随机数
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-    # 环境随机性
     os.environ['PYTHONHASHSEED'] = str(seed)
 
 
