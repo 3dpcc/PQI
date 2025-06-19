@@ -253,7 +253,6 @@ if __name__ == '__main__':
     args = parse_args()
     set_seed(0)
     gt_filedirs = sorted(glob.glob(os.path.join(args.gt_rootdir, f'*' + 'ply'), recursive=True))
-    gt_filedirs = [gt_filedirs[1]]
     os.makedirs(args.output_rootdir,exist_ok=True)
     all_results = {}
     all_results = pd.DataFrame([all_results])
@@ -265,7 +264,6 @@ if __name__ == '__main__':
         ground_truth_sparsetensor = sort_sparse_tensor(ground_truth_sparsetensor)
         ground_truth_coords,   ground_truth_feats = read_ply_ascii(gt)
         is_voxel = has_decimal(ground_truth_coords)
-        # is_voxel = (filename != 'Romanoillamp')
         scale1, scale2, scale3, scale4 = multiscale(ground_truth_sparsetensor, gt, is_voxel)
         for i, test in enumerate(tqdm(test_filedirs)):
             print(test.split('/')[-1])
