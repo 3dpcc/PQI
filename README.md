@@ -72,7 +72,7 @@ SJTU-PCQA
 ```
 Then, execute the following code:
 ```shell
-python test_paper_point.py --gt_rootdir="./SJTU-PCQA/reference" \
+python test_quality.py --gt_rootdir="./SJTU-PCQA/reference" \
                      --test_rootdir="./SJTU-PCQA/distortion" \
                      --output_rootdir="output/SJTU-PCQA"
 ```
