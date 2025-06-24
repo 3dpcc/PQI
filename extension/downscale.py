@@ -27,7 +27,6 @@ def down(gt_file):
                                 transformType=0, qp=4, show=False)
             results_dec = gpcc_decode(bin_dir, rec_dir, show=False)
             downscale_list.append(rec_dir)
-            shutil.rmtree(os.path.join(savepath, 'bin'))
     scale1_coords, scale1_feats = read_ply_ascii(downscale_list[0])
     scale2_coords, scale2_feats = read_ply_ascii(downscale_list[1])
     scale3_coords, scale3_feats = read_ply_ascii(downscale_list[2])
