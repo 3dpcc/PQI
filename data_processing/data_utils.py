@@ -470,9 +470,6 @@ def load_h5_sparse_tensor(input_file, gt_file,  device='cuda', order='rgb'):
     gt = sort_sparse_tensor(gt)
     return x, gt
 
-
 def has_decimal(tensor: torch.Tensor, eps: float = 1e-6) -> bool:
-
-    mask = (tensor % 1).abs() > eps
-
-    return mask.any().item()
+    diff = (tensor - tensor.round()).abs()
+    return (diff > eps).any().item()
