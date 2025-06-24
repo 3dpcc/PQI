@@ -178,7 +178,6 @@ def score_point_parallel(ground_truth, distortion_pc, k, scales):
         for i in range(len(scales))
     ]
     with ThreadPoolExecutor(max_workers=len(scales)) as executor:
-        # 每个 result 是 (score_i, _, _)
         score_results = list(executor.map(lambda args: score(*args), score_args))
 
     scores = [res[0] for res in score_results]
