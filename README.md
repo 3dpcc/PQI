@@ -6,7 +6,7 @@ The demand for full-reference point cloud quality assessment (PCQA) has extended
 
 
 ## News
-* 2025.06.17 PQI was accepted by TVCG.
+* 2025.06.17 PQI was accepted by TVCG. (https://ieeexplore.ieee.org/document/11048499)
 
 ## ⚙️ Environment Install 
 
